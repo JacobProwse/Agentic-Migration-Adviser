@@ -1,0 +1,27 @@
+[project]
+name = "agentic-migration-adviser"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Jacob", email = "57604432+JacobProwse@users.noreply.github.com" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "liboqs-python>=0.16.0",
+]
+
+[project.scripts]
+agentic-migration-adviser = "agentic_migration_adviser:main"
+
+[build-system]
+requires = ["uv_build>=0.12.17,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
