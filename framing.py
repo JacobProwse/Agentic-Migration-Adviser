@@ -15,7 +15,7 @@ def send_msg(sock: socket.socket, data: bytes) -> None:
     sock.sendall(header + data)
 
 def recv_msg(sock: socket.socket) -> bytes:
-    """Receive a length-prefixed message. Raises a FramingError if the message size exceeds MAX_MESSAGE_LENGTH."""
+    """Receive a length-prefixed message. Raises a FramingError if the message size exceeds MAX_MESSAGE_LENGTH or ConnectionError if peer closed mid-message."""
     # Read the fixed-size header
     raw_header = _recvn(sock, HEADER.size)
     (msg_len,) = HEADER.unpack(raw_header)
