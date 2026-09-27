@@ -76,7 +76,7 @@ def test_peer_closes_mid_message(socket_pair):
     sender.close()
     
     #Act | attempt to receive the message and expect a ConnectionError due to incomplete message
-    with pytest.raises(ConnectionError) as exc_info:
+    with pytest.raises(ConnectionError):
         framing.recv_msg(receiver)
 
 def test_oversized_header(socket_pair):

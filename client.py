@@ -1,33 +1,26 @@
 import socket
 import framing
-import handshake
+from handshake import Client, HandshakeError
+import server
+import hashlib
+import sys
 
-def client_program():
-    host = '127.0.0.1'  # loopback address for local testing
-    port = 1025  # socket server port number
-    
-    with socket.create_connection((host, port)) as client_socket:
+def client_program(host=server.HOST, port=server.PORT):
+    with socket.create_connection((host, port), timeout=10) as client_socket:
         print(f"Connected to server at {host}:{port}")
 
-        message = input(" -> ")  # take input
-
-        while message.lower().strip() != 'bye':
-            framing.send_msg(client_socket, message.encode())  # send message
-            raw = framing.recv_msg(client_socket)  # receive response
-            if not raw:
-                break
-            try:
-                data = raw.decode('utf-8')
-            except UnicodeDecodeError:
-                print("Received non-UTF-8 data from server, skipping")
-                continue
-
-            print('Received from server: ' + data)  # show in terminal
-
-            message = input(" -> ")  # again take input
-
-        client_socket.close()  # close the connection
+        client = Client()
+        framing.send_msg(client_socket, client.public_key)  # send public key to server
+        ciphertext = framing.recv_msg(client_socket)  # receive ciphertext from server
+        shared_secret_client = client.decaps(ciphertext)  # decapsulate to get shared secret
+    return shared_secret_client
 
 
 if __name__ == '__main__':
-    client_program()
+    try:
+        shared_secret_client = client_program()
+    except (ConnectionError, framing.FramingError, TimeoutError, HandshakeError) as e:
+        print(e)
+        sys.exit(1)
+    hashed_shared_secret_client = hashlib.sha256(shared_secret_client).hexdigest()
+    print(f"Hashed shared secret snippet: {hashed_shared_secret_client[:16]}...")

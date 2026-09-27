@@ -1,29 +1,33 @@
 import socket
 import framing
-import handshake
+from handshake import Server, HandshakeError
+import hashlib
+import sys
 
 HOST = '127.0.0.1'  # loopback address for local testing
-PORT = 1025  # initiate port no above 1024
+PORT = 65432  # initiate port number
+
+def server_helper(listener):
+    conn, address = listener.accept()  # accept new connection
+    conn.settimeout(10)  # set a timeout for the connection
+    with conn:
+        print(f"Connection from: {address}")
+        client_public_key = framing.recv_msg(conn)  # receive public key from client
+        ciphertext, shared_secret_server = Server.encaps(client_public_key)  # encapsulate to get ciphertext and shared secret
+        framing.send_msg(conn, ciphertext)  # send ciphertext back to client
+    return shared_secret_server
 
 def server_program(host=HOST, port=PORT):
-    with socket.create_server((host, port), family=socket.AF_INET, backlog=5) as server_socket:
-        server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # allow reuse of the address
-        server_socket.listen(5)  # listen for incoming connections
+    with socket.create_server((host, port)) as server_socket:
         print(f"Server listening on {server_socket.getsockname()}")
-
-        conn, address = server_socket.accept()  # accept new connection
-        print("Connection from: " + str(address))
-        while True:
-            data = framing.recv_msg(conn)  # receive message
-            if not data:
-                break
-            print("from connected user: " + str(data.decode('utf-8')))
-            data = input(' -> ')  # take input
-            framing.send_msg(conn, data.encode())  # send message back to client
-
-        conn.close()  # close the connection
-        server_socket.close()  # close the listening socket
+        return server_helper(server_socket) # return the shared secret for verification
 
 
 if __name__ == '__main__':
-    server_program()
+    try:
+        shared_secret_server = server_program()
+    except (ConnectionError, framing.FramingError, TimeoutError, HandshakeError) as e:
+        print(e)
+        sys.exit(1)
+    hashed_shared_secret_server = hashlib.sha256(shared_secret_server).hexdigest()
+    print(f"Hashed shared secret snippet: {hashed_shared_secret_server[:16]}...")  # print only the first 16 hex characters
