@@ -6,6 +6,7 @@ import hashlib
 import sys
 
 def client_program(host=server.HOST, port=server.PORT):
+    """Starts the client connection and begins 3-way handshake by sending public_key to server at (host, port)."""
     with socket.create_connection((host, port), timeout=10) as client_socket:
         print(f"Connected to server at {host}:{port}")
 
