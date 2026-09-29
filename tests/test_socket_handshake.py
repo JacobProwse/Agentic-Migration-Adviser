@@ -1,5 +1,5 @@
 import socket
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, wait
 
 import pytest
 import oqs
@@ -51,3 +51,14 @@ def test_no_server_listening():
         port = listener.getsockname()[1]
     with pytest.raises(ConnectionRefusedError):
         client_program(port=port)
+
+def test_server_timeout_on_silent_client(listener_and_port):
+    """Verify server times out a silent client so the server doesn't block forever on a client that connects and sends nothing."""
+    listener, port = listener_and_port
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        server_future = executor.submit(server.server_helper, listener, timeout=0.5)
+        # Client connection kept open to replicate silent client
+        with socket.create_connection((server.HOST, port), timeout=2) as client_socket:
+            assert server_future in wait([server_future], timeout=5).done
+            with pytest.raises(TimeoutError):
+                server_future.result()
