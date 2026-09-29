@@ -44,3 +44,10 @@ def test_server_rejects_wrong_size_public_key(listener_and_port):
                 server_future.result(timeout=2)
             with pytest.raises(ConnectionError):
                 framing.recv_msg(client_socket)  # server should close without sending
+
+def test_no_server_listening():
+    """Test the client fails fast with a clear error when no server is running, rather than hanging."""
+    with socket.create_server((server.HOST, 0)) as listener:
+        port = listener.getsockname()[1]
+    with pytest.raises(ConnectionRefusedError):
+        client_program(port=port)
