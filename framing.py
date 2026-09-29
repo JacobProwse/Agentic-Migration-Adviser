@@ -5,7 +5,7 @@ MAX_MESSAGE_LENGTH = 2**20 # 1MiB cap for message size to prevent DoS attacks wh
 HEADER = struct.Struct("!I")  # Network byte order (big-endian) unsigned int
 
 class FramingError(Exception):
-    """Custom exception for framing errors."""
+    """Custom exception for when message length exceeds maximum number of bytes."""
 
 def send_msg(sock: socket.socket, data: bytes) -> None:
     """Send data with a fixed length prefix."""
