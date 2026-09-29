@@ -89,3 +89,9 @@ def test_public_key_error():
     # Assert
     with pytest.raises(HandshakeError):
         Server.encaps(b"wrong key size") # Act
+
+def test_keypairs_are_ephemeral():
+    #Arrange
+    client1 = Client()
+    client2 = Client()
+    assert client1.public_key != client2.public_key
