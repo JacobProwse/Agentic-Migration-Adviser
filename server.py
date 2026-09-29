@@ -6,10 +6,12 @@ import sys
 
 HOST = '127.0.0.1'  # loopback address for local testing
 PORT = 65432  # initiate port number
+CONN_TIMEOUT = 10 # default connection timeout 10s
 
-def server_helper(listener):
+def server_helper(listener, timeout=CONN_TIMEOUT):
+    """Handles connections on given server socket. Timeout applies to each receive on the accepted connection."""
     conn, address = listener.accept()  # accept new connection
-    conn.settimeout(10)  # set a timeout for the connection
+    conn.settimeout(timeout)  # set a timeout for the connection
     with conn:
         print(f"Connection from: {address}")
         client_public_key = framing.recv_msg(conn)  # receive public key from client
@@ -18,6 +20,7 @@ def server_helper(listener):
     return shared_secret_server
 
 def server_program(host=HOST, port=PORT):
+    """Setup socket and run program."""
     with socket.create_server((host, port)) as server_socket:
         print(f"Server listening on {server_socket.getsockname()}")
         return server_helper(server_socket) # return the shared secret for verification
