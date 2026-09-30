@@ -24,4 +24,4 @@ if __name__ == '__main__':
         print(e)
         sys.exit(1)
     hashed_shared_secret_client = hashlib.sha256(shared_secret_client).hexdigest()
-    print(f"Hashed shared secret snippet: {hashed_shared_secret_client[:16]}...")
+    print(f"Client hashed shared secret snippet: {hashed_shared_secret_client[:16]}...")

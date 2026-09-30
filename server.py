@@ -33,4 +33,4 @@ if __name__ == '__main__':
         print(e)
         sys.exit(1)
     hashed_shared_secret_server = hashlib.sha256(shared_secret_server).hexdigest()
-    print(f"Hashed shared secret snippet: {hashed_shared_secret_server[:16]}...")  # print only the first 16 hex characters
+    print(f"Server hashed shared secret snippet: {hashed_shared_secret_server[:16]}...")  # print only the first 16 hex characters
