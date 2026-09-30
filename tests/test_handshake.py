@@ -17,7 +17,7 @@ def test_shared_secret_matches():
     #Assert
     assert shared_secret_receiver == shared_secret_server
 
-def test_tamper_detection():
+def test_implicit_rejection():
     """Verify that tampering with the ciphertext results in a different shared secret after decapsulation."""
     #Arrange
     client = Client()
