@@ -1,7 +1,7 @@
 [project]
 name = "agentic-migration-adviser"
 version = "0.1.0"
-description = "Add your description here"
+description = "This tool will scan a codebase, flag classical crypto usage, and produce a risk-ranked migration roadmap mapped to NIST's PQC standards."
 readme = "README.md"
 authors = [
     { name = "Jacob", email = "57604432+JacobProwse@users.noreply.github.com" }
