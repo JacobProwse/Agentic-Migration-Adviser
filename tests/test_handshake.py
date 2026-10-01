@@ -1,0 +1,108 @@
+from handshake import Client, Server, HandshakeError, ALGORITHM
+import pytest
+import oqs
+
+"""FIPS_PUBLIC_KEY_SIZE = 1184
+FIPS_PRIVATE_KEY_SIZE = 2400
+FIPS_SHARED_SECRET_SIZE = 32
+FIPS_CIPHERTEXT_SIZE = 1088"""
+
+def test_shared_secret_matches():
+    """Verify both sides derive the same shared secret after decapsulation."""
+    #Arrange
+    client = Client()
+    server = Server()
+    #Act
+    ciphertext, shared_secret_server = server.encaps(client.public_key)
+    shared_secret_receiver = client.decaps(ciphertext)
+    #Assert
+    assert shared_secret_receiver == shared_secret_server
+
+def test_implicit_rejection():
+    """Verify that tampering with the ciphertext results in a different shared secret after decapsulation."""
+    #Arrange
+    client = Client()
+    server = Server()
+    ciphertext, shared_secret_server = server.encaps(client.public_key)
+    #Act
+    ciphertext_tampered = bytearray(ciphertext)
+    ciphertext_tampered[0] ^= 0x01  # Flip the last bit of the first byte to simulate tampering
+    shared_secret_receiver = client.decaps(bytes(ciphertext_tampered))
+    #Assert
+    assert shared_secret_receiver != shared_secret_server
+
+def test_public_key_size():
+    """Verify that the public key sizes match expected algorithm."""
+    #Arrange#Act
+    client = Client()
+    with oqs.KeyEncapsulation(ALGORITHM) as kem:
+        public_key_size = kem.details["length_public_key"]
+    #Assert
+    assert len(client.public_key) == public_key_size
+
+def test_private_key_size():
+    """Verify that the private key size match expected algorithm."""
+    #Arrange#Act
+    client = Client()
+    with oqs.KeyEncapsulation(ALGORITHM) as kem:
+        private_key_size = kem.details["length_secret_key"]
+    #Assert
+    assert client.private_key_len == private_key_size
+
+def test_shared_secret_size():
+    """Verify that the shared secret size matches the expected algorithm."""
+    #Arrange
+    client = Client()
+    server = Server()
+    with oqs.KeyEncapsulation(ALGORITHM) as kem:
+        shared_secret_size = kem.details["length_shared_secret"]
+    #Act
+    _, shared_secret_server = server.encaps(client.public_key)
+    #Assert
+    assert len(shared_secret_server) == shared_secret_size
+
+def test_ciphertext_size():
+    """Verify that the ciphertext size matches the expected algorithm."""
+    #Arrange
+    client = Client()
+    server = Server()
+    with oqs.KeyEncapsulation(ALGORITHM) as kem:
+        ciphertext_size = kem.details["length_ciphertext"]
+    #Act
+    ciphertext, _ = server.encaps(client.public_key)
+    #Assert
+    assert len(ciphertext) == ciphertext_size
+
+def test_diff_handshakes_give_diff_secrets():
+    """Verify that two separate handshakes yield different shared secrets."""
+    #Arrange
+    client1 = Client()
+    server1 = Server()
+    client2 = Client()
+    server2 = Server()
+    #Act
+    _, shared_secret_server1 = server1.encaps(client1.public_key)
+    _, shared_secret_server2 = server2.encaps(client2.public_key)
+    #Assert
+    assert shared_secret_server1 != shared_secret_server2
+
+def test_ciphertext_error():
+    """Verify decaps raises a HandshakeError when given a ciphertext of the wrong size."""
+    # Arrange
+    client = Client()
+    # Assert
+    with pytest.raises(HandshakeError):
+        client.decaps(b"wrong ciphertext size") # Act
+
+def test_public_key_error():
+    """Verify encaps raises a HandshakeError when given a public key of the wrong size."""
+    # Assert
+    with pytest.raises(HandshakeError):
+        Server.encaps(b"wrong public key size") # Act
+
+def test_keypairs_are_ephemeral():
+    """Verify each client instance generates a fresh keypair."""
+    #Arrange
+    client1 = Client()
+    client2 = Client()
+    assert client1.public_key != client2.public_key
