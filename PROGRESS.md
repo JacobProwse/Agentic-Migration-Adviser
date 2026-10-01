@@ -7,7 +7,7 @@
 - Setup git on local device and made initial commit.
 - Developed README.md skeleton
 - Developed PROGRESS.md skeleton
-- Developed procedural ML-KEM/hybrid-handshake script
+- Developed procedural ML-KEM handshake script
 - Updated handshake script into client & server
 - Setup tests for handshake
 
@@ -42,8 +42,6 @@ Why: the findings are naturally relational, queries can track risk across scans,
 - Completed integration test
 - Updated PROGRESS.md
 - Updated README.md
-- Merged PR
-- Setup GitHub CI workflow
 
 **Didn't get to:**
 - 
@@ -52,8 +50,8 @@ Why: the findings are naturally relational, queries can track risk across scans,
 - 
 
 **Decisions made (and why):**
-- 
+- Deleted ml-kem-demo.py to remove redundancy covered by integration test.
 
-**Time spent:** ~4.5 hrs so far (Wednesday) (over/under/achieved the 10–12 target; why?)
+**Time spent:** ~6 hrs so far (Wednesday) (over/under/achieved the 10–12 target; why?)
 
 **Next week:** 
