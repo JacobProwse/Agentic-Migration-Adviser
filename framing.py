@@ -1,7 +1,7 @@
 import socket
 import struct
 
-MAX_MESSAGE_LENGTH = 2**20 # 1MiB cap for message size to prevent DoS attacks whilst allowing for large messages such as McEliece-sized keys
+MAX_MESSAGE_LENGTH = 2**20 # 1MiB cap for message size to prevent DoS attacks whilst allowing for large messages/keys. This is a reasonable upper limit for most use cases, but can be adjusted as needed.
 HEADER = struct.Struct("!I")  # Network byte order (big-endian) unsigned int
 
 class FramingError(Exception):
