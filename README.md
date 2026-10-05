@@ -30,13 +30,13 @@ The orchestration is hand-rolled, without an agent framework. It uses a local
 LLM through Ollama, so no API keys leave the machine.
 
 ## What's in this release
-- `handshake.py`: ML-KEM-768 KeyGen → Encaps → Decaps using liboqs-python
+- `handshake.py`: the algorithm is set by the ALGORITHM constant (currently ML-KEM-768, tests adapt accordingly) KeyGen → Encaps → Decaps using liboqs-python.
 - `client.py`/`server.py`: Handshake split over TCP sockets. The client
   generates the keypair and the server encapsulates, mirroring how TLS 1.3
   hybrid key exchange (X25519MLKEM768) carries the public key in the
   ClientHello and returns the ciphertext in the ServerHello.
 - `test_handshake.py`: test_shared_secret_matches, test_implicit_rejection, test_public_key_size, test_private_key_size, test_shared_secret_size, test_ciphertext_size, test_diff_handshakes_give_diff_secrets, test_ciphertext_error, test_public_key_error, test_keypairs_are_ephemeral
-- `test_framing.py`: test_round_trip, test_realistic_size, test_message_boundaries, test_fragmented_delivery, test_peer_closes_mid_message, test_oversized_header, test_empty_payload
+- `test_framing.py`: test_round_trip, test_realistic_size, test_message_boundaries, test_fragmented_delivery, test_peer_closes_mid_message, test_oversized_header, test_empty_payload.
 - `test_socket_handshake.py`: integration tests. test_secrets_match check client and server get the same key of the correct length. test_server_rejects_wrong_size_public_key, test_client_fails_when_no_server_listening, test_server_timeout_on_silent_client.
 
 ## Quick start
@@ -57,7 +57,8 @@ Connection from: ('127.0.0.1', 63012)
 Server hashed shared secret snippet: ba1a49dc2b7b70bc...
 Client hashed shared secret snippet: ba1a49dc2b7b70bc...
 21 passed in 0.54s
-For reference, FIPS 203 specifies these ML-KEM-768 sizes: public key 1184 B,
+
+For reference, FIPS 203 specifies these ML-KEM-768 (current set algorithm) sizes: public key 1184 B,
 ciphertext 1088 B, shared secret 32 B.
 
 ## Design decisions
@@ -66,7 +67,7 @@ ciphertext 1088 B, shared secret 32 B.
 - **Client generates the keypair, server encapsulates:** this matches the real TLS 1.3 hybrid flow (however I only used ML-KEM not hybrid).
 
 ## What I learned
-- Where a rule should live matters as much as the rule itself. I initially considered enforcing the exact 1,184-byte public key size in the framing layer. Instead, the framing layer checks against a generic 1 MiB cap, on both send and receive, whilst the handshake layer checks the exact 1,184-byte public key. The revision came from the principle that lower layers should provide mechanism, whilst higher layers decide policy. The principle ensures that the behaviour of lower layers is independent of the process which sits above it. If the algorithm changes in later development the framing module doesn't need adjusting.
+- Where a rule should live matters as much as the rule itself. I initially considered enforcing the exact public key size in the framing layer. Instead, the framing layer checks against a generic 1 MiB cap, on both send and receive, whilst the handshake layer checks the exact public key. The revision came from the principle that lower layers should provide mechanism, whilst higher layers decide policy. The principle ensures that the behaviour of lower layers is independent of the process which sits above it. If the algorithm changes in later development the framing module doesn't need adjusting.
 - A test that can't fail gives false confidence. I thought running two handshakes and asserting their secrets differ would ensure that each client generates a fresh keypair. Then, I realised that the test would have passed even if the client reused its keypair, because encaps adds its own randomness. Instead, I produced a unit test that directly compares the public keys of two Client instances. Now, before trusting a test, I make sure to try at least one mutation check to make sure that a test really can fail; using git restore to make sure the deliberate break never gets committed.
 - The liboqs library handles the maths, not the protocol. It made generating keys & ciphertexts easy for running a basic procedural program. However, I had to provide the framework by splitting protocol roles between the client/server sockets, verifying implicit rejection of a tampered ciphertext (since decaps returns a wrong secret with no exception) and more.
 

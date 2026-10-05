@@ -40,18 +40,24 @@ Why: the findings are naturally relational, queries can track risk across scans,
 **Done:**
 - Completed ML-KEM handshake demo via client/server sockets
 - Completed integration test
-- Updated PROGRESS.md
 - Updated README.md
+- Merged feature branch
+- First release: v0.1 — ML-KEM foundations
+- Test and program algorithm agnostic (change ALGORITHM in handshake.py)
 
 **Didn't get to:**
-- 
+- Set up CI workflow
 
 **Blocked / struggled with:**
-- 
+- Finishing demo due to scope creep
 
 **Decisions made (and why):**
 - Deleted ml-kem-demo.py to remove redundancy covered by integration test.
+- Tests should derive sizes from liboqs so ALGORITHM is the single source of truth
 
-**Time spent:** ~6 hrs so far (Wednesday) (over/under/achieved the 10–12 target; why?)
+**Time spent:** ~9 hrs (slightly under 10–12 target; focused more on applications this week)
 
 **Next week:** 
+- Set up CI workflow
+- Learn how to create/use agents
+- Set up scanner agent framework

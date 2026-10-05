@@ -32,13 +32,13 @@ def test_secrets_match(shared_secret_length, listener_and_port):
     assert len(server_shared_secret) == shared_secret_length
 
 def test_server_rejects_wrong_size_public_key(listener_and_port):
-    """Checks the server rejects a client configured with an ML-KEM-512 public key."""
+    """Checks the server rejects a client configured with an incorrectly lengthed public key."""
     listener, port = listener_and_port
     with ThreadPoolExecutor(max_workers=1) as executor:
         server_future = executor.submit(server.server_helper, listener)
         with socket.create_connection((server.HOST, port), timeout=2) as client_socket:
-            with oqs.KeyEncapsulation("ML-KEM-512") as kem:
-                public_key = kem.generate_keypair()
+            with oqs.KeyEncapsulation(handshake.ALGORITHM) as kem:
+                public_key = kem.generate_keypair() + b"extra_bytes"  # intentionally make public key too long
             framing.send_msg(client_socket, public_key)  # send public key to server
             with pytest.raises(handshake.HandshakeError):
                 server_future.result(timeout=2)

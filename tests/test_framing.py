@@ -35,7 +35,7 @@ def test_round_trip(socket_pair):
     assert received == b"Hello, world!"
 
 def test_realistic_size(socket_pair):
-    """Check a payload the size of an ML-KEM public key (1,184 bytes) arrives intact."""
+    """Check a payload the size of a typical PQC-sized payload arrives intact."""
     #Arrange | unpack socket pair & create a payload of 1,184 bytes
     payload = bytes(1184)
     sender, receiver = socket_pair

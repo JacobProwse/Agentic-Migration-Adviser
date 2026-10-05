@@ -2,11 +2,6 @@ from handshake import Client, Server, HandshakeError, ALGORITHM
 import pytest
 import oqs
 
-"""FIPS_PUBLIC_KEY_SIZE = 1184
-FIPS_PRIVATE_KEY_SIZE = 2400
-FIPS_SHARED_SECRET_SIZE = 32
-FIPS_CIPHERTEXT_SIZE = 1088"""
-
 def test_shared_secret_matches():
     """Verify both sides derive the same shared secret after decapsulation."""
     #Arrange
