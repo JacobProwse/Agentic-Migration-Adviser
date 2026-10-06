@@ -1,6 +1,9 @@
 import socket
-import framing
+
 import pytest
+
+import framing
+
 
 class FakeSocket:
     """Stands in for a socket: each recv() returns the next prepared chunk."""
