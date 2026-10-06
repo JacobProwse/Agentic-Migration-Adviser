@@ -1,6 +1,8 @@
-from handshake import Client, Server, HandshakeError, ALGORITHM
-import pytest
 import oqs
+import pytest
+
+from handshake import ALGORITHM, Client, HandshakeError, Server
+
 
 def test_shared_secret_matches():
     """Verify both sides derive the same shared secret after decapsulation."""

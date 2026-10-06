@@ -32,7 +32,7 @@ Why: the findings are naturally relational, queries can track risk across scans,
 
 **Time spent:** ~20 hrs so far (over the 10–12 target; Prioritised project over applications this week to develop portfolio. Pushed slightly ahead of schedule but lots of time went into learning ML-KEM algorithm and libraries).
 
-**Next week:** Complete ML-KEM demo & tests. Merge PR. Setup CI workflow. Begin Risk Assessor Agent/Agentic Architecture.
+**Next week:** Complete ML-KEM demo & tests. Merge PR. Setup CI workflow.
 
 ## Week 2 (2026-09-28 – 2026-10-04)
 **Focus:** Finish ML-KEM-DEMO & merge branch. Setup CI workflow. Start work on agents.
@@ -41,7 +41,7 @@ Why: the findings are naturally relational, queries can track risk across scans,
 - Completed ML-KEM handshake demo via client/server sockets
 - Completed integration test
 - Updated README.md
-- Merged feature branch
+- Merged PR #1, tagged v0.1-foundations
 - First release: v0.1 — ML-KEM foundations
 - Test and program algorithm agnostic (change ALGORITHM in handshake.py)
 
