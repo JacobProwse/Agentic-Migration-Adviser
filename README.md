@@ -35,9 +35,9 @@ LLM through Ollama, so no API keys leave the machine.
   generates the keypair and the server encapsulates, mirroring how TLS 1.3
   hybrid key exchange (X25519MLKEM768) carries the public key in the
   ClientHello and returns the ciphertext in the ServerHello.
-- `test_handshake.py`: test_shared_secret_matches, test_implicit_rejection, test_public_key_size, test_private_key_size, test_shared_secret_size, test_ciphertext_size, test_diff_handshakes_give_diff_secrets, test_ciphertext_error, test_public_key_error, test_keypairs_are_ephemeral
-- `test_framing.py`: test_round_trip, test_realistic_size, test_message_boundaries, test_fragmented_delivery, test_peer_closes_mid_message, test_oversized_header, test_empty_payload.
-- `test_socket_handshake.py`: integration tests. test_secrets_match check client and server get the same key of the correct length. test_server_rejects_wrong_size_public_key, test_client_fails_when_no_server_listening, test_server_timeout_on_silent_client.
+- `test/test_handshake.py`: test/test_shared_secret_matches, test/test_implicit_rejection, test/test_public_key_size, test/test_private_key_size, test/test_shared_secret_size, test/test_ciphertext_size, test/test_diff_handshakes_give_diff_secrets, test/test_ciphertext_error, test/test_public_key_error, test/test_keypairs_are_ephemeral
+- `test/test_framing.py`: test/test_round_trip, test/test_realistic_size, test/test_message_boundaries, test/test_fragmented_delivery, test/test_peer_closes_mid_message, test/test_oversized_header, test/test_empty_payload.
+- `test/test_socket_handshake.py`: integration tests. test/test_secrets_match check client and server get the same key of the correct length. test/test_server_rejects_wrong_size_public_key, test/test_client_fails_when_no_server_listening, test/test_server_timeout_on_silent_client.
 
 ## Quick start
 Requires Python >=3.10 and
@@ -51,12 +51,16 @@ Requires Python >=3.10 and
 
 ## Example output
 
+```text
+
 Server listening on ('127.0.0.1', 65432)
 Connected to server at 127.0.0.1:65432
 Connection from: ('127.0.0.1', 63012)
 Server hashed shared secret snippet: ba1a49dc2b7b70bc...
 Client hashed shared secret snippet: ba1a49dc2b7b70bc...
 21 passed in 0.54s
+
+```
 
 For reference, FIPS 203 specifies these ML-KEM-768 (current set algorithm) sizes: public key 1184 B,
 ciphertext 1088 B, shared secret 32 B.
