@@ -26,7 +26,7 @@ class Client:
             ciphertext_size = len(ciphertext)
             expected_ciphertext_size = kem.details["length_ciphertext"]
             if  ciphertext_size != expected_ciphertext_size:
-                raise HandshakeError(f"Received public key size {ciphertext_size} bytes. Expected {expected_ciphertext_size} bytes.")
+                raise HandshakeError(f"Received ciphertext size {ciphertext_size} bytes. Expected {expected_ciphertext_size} bytes.")
             return kem.decap_secret(ciphertext)
 
 class Server:

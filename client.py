@@ -1,9 +1,11 @@
-import socket
-import framing
-from handshake import Client, HandshakeError
-import server
 import hashlib
+import socket
 import sys
+
+import framing
+import server
+from handshake import Client, HandshakeError
+
 
 def client_program(host=server.HOST, port=server.PORT):
     """Starts the client connection and begins 3-way handshake by sending public_key to server at (host, port)."""

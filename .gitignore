@@ -13,6 +13,14 @@ __pycache__/
 # macOS
 .DS_Store
 
-# Model files, in case you ever download one into the repo
+# Model files, in case ever downloadd into the repo
 *.gguf
 *.safetensors
+
+#SQLite
+*.db
+*.sqlite*
+
+#UV
+dist/
+build/

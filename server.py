@@ -1,8 +1,9 @@
-import socket
-import framing
-from handshake import Server, HandshakeError
 import hashlib
+import socket
 import sys
+
+import framing
+from handshake import HandshakeError, Server
 
 HOST = '127.0.0.1'  # loopback address for local testing
 PORT = 65432  # initiate port number

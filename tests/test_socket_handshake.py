@@ -1,13 +1,14 @@
 import socket
 from concurrent.futures import ThreadPoolExecutor, wait
 
-import pytest
 import oqs
+import pytest
 
-import handshake
-from client import client_program
-import server
 import framing
+import handshake
+import server
+from client import client_program
+
 
 @pytest.fixture(scope="module")
 def shared_secret_length():
@@ -58,7 +59,7 @@ def test_server_timeout_on_silent_client(listener_and_port):
     with ThreadPoolExecutor(max_workers=1) as executor:
         server_future = executor.submit(server.server_helper, listener, timeout=0.5)
         # Client connection kept open to replicate silent client
-        with socket.create_connection((server.HOST, port), timeout=2) as client_socket:
+        with socket.create_connection((server.HOST, port), timeout=2):
             assert server_future in wait([server_future], timeout=5).done
             with pytest.raises(TimeoutError):
                 server_future.result()
