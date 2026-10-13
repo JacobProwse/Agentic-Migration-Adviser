@@ -35,7 +35,7 @@ Why: the findings are naturally relational, queries can track risk across scans,
 **Next week:** Complete ML-KEM demo & tests. Merge PR. Setup CI workflow.
 
 ## Week 2 (2026-09-28 – 2026-10-04)
-**Focus:** Finish ML-KEM-DEMO & merge branch. Setup CI workflow. Start work on agents.
+**Focus:** Finish ML-KEM-DEMO & merge branch. Set up CI workflow. Start work on agents.
 
 **Done:**
 - Completed ML-KEM handshake demo via client/server sockets
@@ -61,3 +61,63 @@ Why: the findings are naturally relational, queries can track risk across scans,
 - Set up CI workflow
 - Learn how to create/use agents
 - Set up scanner agent framework
+
+## Week 3 (2026-10-05 – 2026-10-11)
+**Focus:** Finish ML-KEM-DEMO & merge branch. Setup CI workflow. Start work on agents.
+
+**Done:**
+- Merged the refactor PR
+- CI workflow refactor (formatting imports, etc)
+- Set up CI workflow (and merged PR)
+- Learnt AI agent basics (what an agent is & how to set up in python)
+- Began using issues (v0.2 scanner agent milestone)
+
+**Didn't get to:**
+- Start on scanner agent
+
+**Blocked / struggled with:**
+- More time on setting up CI workflow than planned since some demo code needs refactoring
+- Dedicated more time to applications
+
+**Decisions made (and why):**
+- **Merged PR #1 before CI existed; CI gets its own `ci/github-actions` branch.** Why: one purpose per PR, didn't want to hold the
+  foundations release hostage to CI. Tagged `v0.1-foundations`.
+- **Tests derive sizes from liboqs, so `ALGORITHM` in `handshake.py` is the single source of truth.** Why: tests keep working if the parameter set
+  changes. Checked by swapping to ML-KEM-512 and ML-KEM-1024 and confirming
+  everything still passes (mutation check).
+- **Kept the algorithm-agnostic refactor in its own PR.** The branch was
+  accidentally cut from the CI branch, so I rebased it onto `main` to drop
+  the two CI commits. Why: one purpose per PR.
+- **MIT licence** added, declared in pyproject.toml (`license = "MIT"`). Why: allows others to use, change, and distribute the software.
+- **Confirmed Ollama use for the agent loop.** Why: runs locally on my device without any additional cost for API usage. Checked that ollama supports tool calling for the loop.
+- **Using SQLite as shared state between agents.** Why: The findings are deterministic facts produced by static analysis. The LLM reasons over stored, verifiable records (file X, line Y). That cuts down on hallucinated findings and gives an audit trail. Open question of whether assessments go in their own table.
+- **Planning the Scanner so other languages can be added later, without building that now.** Why: The main classical cryptography identification is done using python ast. I want to set up for efficient adjustments/improvements in the future (scans C, C++, etc files) without dedicating unnecessary time now.
+
+**Time spent:** ~4.5 hrs (under 10–12 target; focused more on applications this week)
+
+**Next week:** 
+- Scanner agent design & decisions (regarding tools, scope, sqlite, etc)
+- Create issues/work schedule for scanner agent
+- Scanner agent file framework
+- Scannar agent API
+- Scanner agent fitted with basic tools
+
+## Week 4 (2026-10-12 - 2026-10-18)
+**Focus:** Scanner agent design and foundations
+
+**Done:**
+- 
+
+**Didn't get to:**
+- 
+
+**Blocked / struggled with:**
+- 
+
+**Decisions made (and why):**
+- 
+
+**Time spent:** ~1 hrs (under/expected/over 10–12 target; Why?)
+
+**Next week:** 
+- 
