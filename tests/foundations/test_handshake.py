@@ -1,6 +1,5 @@
 import oqs
 import pytest
-
 from handshake import ALGORITHM, Client, HandshakeError, Server
 
 
