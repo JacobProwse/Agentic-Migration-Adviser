@@ -1,8 +1,7 @@
 import socket
 
-import pytest
-
 import framing
+import pytest
 
 
 class FakeSocket:

@@ -29,15 +29,25 @@ flowchart LR
 The orchestration is hand-rolled, without an agent framework. It uses a local
 LLM through Ollama, so no API keys leave the machine.
 
+## Repository layout
+foundations/ holds the v0.1 ML-KEM handshake groundwork, meaning the handshake, framing, client and server modules, with their tests in tests/foundations/.
+src/agentic_migration_adviser/ is the actual migration tool, where the Scanner, Risk Assessor and Planner will live.
+I split them since the demo was for learning ML-KEM and isn’t part of the tool itself. Keeping it separate stops it mixing with the product code.
+
+foundations/                  # v0.1: ML-KEM handshake demo
+tests/foundations/
+src/agentic_migration_adviser/  # the migration tool (Scanner onwards)
+tests/scanner/                # coming in v0.2
+
 ## What's in this release
-- `handshake.py`: the algorithm is set by the ALGORITHM constant (currently ML-KEM-768, tests adapt accordingly) KeyGen → Encaps → Decaps using liboqs-python.
-- `client.py`/`server.py`: Handshake split over TCP sockets. The client
+- `foundations/handshake.py`: the algorithm is set by the ALGORITHM constant (currently ML-KEM-768, tests adapt accordingly) KeyGen → Encaps → Decaps using liboqs-python.
+- `foundations/client.py`/`foundations/server.py`: Handshake split over TCP sockets. The client
   generates the keypair and the server encapsulates, mirroring how TLS 1.3
   hybrid key exchange (X25519MLKEM768) carries the public key in the
   ClientHello and returns the ciphertext in the ServerHello.
-- `test/test_handshake.py`: test/test_shared_secret_matches, test/test_implicit_rejection, test/test_public_key_size, test/test_private_key_size, test/test_shared_secret_size, test/test_ciphertext_size, test/test_diff_handshakes_give_diff_secrets, test/test_ciphertext_error, test/test_public_key_error, test/test_keypairs_are_ephemeral
-- `test/test_framing.py`: test/test_round_trip, test/test_realistic_size, test/test_message_boundaries, test/test_fragmented_delivery, test/test_peer_closes_mid_message, test/test_oversized_header, test/test_empty_payload.
-- `test/test_socket_handshake.py`: integration tests. test/test_secrets_match check client and server get the same key of the correct length. test/test_server_rejects_wrong_size_public_key, test/test_client_fails_when_no_server_listening, test/test_server_timeout_on_silent_client.
+- `foundations/test/test_handshake.py`: test/test_shared_secret_matches, test/test_implicit_rejection, test/test_public_key_size, test/test_private_key_size, test/test_shared_secret_size, test/test_ciphertext_size, test/test_diff_handshakes_give_diff_secrets, test/test_ciphertext_error, test/test_public_key_error, test/test_keypairs_are_ephemeral
+- `foundations/test/test_framing.py`: test/test_round_trip, test/test_realistic_size, test/test_message_boundaries, test/test_fragmented_delivery, test/test_peer_closes_mid_message, test/test_oversized_header, test/test_empty_payload.
+- `foundations/test/test_socket_handshake.py`: integration tests. test/test_secrets_match check client and server get the same key of the correct length. test/test_server_rejects_wrong_size_public_key, test/test_client_fails_when_no_server_listening, test/test_server_timeout_on_silent_client.
 
 ## Quick start
 Requires Python >=3.10 and
@@ -46,7 +56,7 @@ Requires Python >=3.10 and
     git clone https://github.com/JacobProwse/Agentic-Migration-Adviser.git
     cd Agentic-Migration-Adviser
     uv sync
-    uv run python server.py & sleep 1 && uv run python client.py
+    uv run python foundations/server.py & sleep 1 && uv run python foundations/client.py
     uv run pytest -q
 
 ## Example output

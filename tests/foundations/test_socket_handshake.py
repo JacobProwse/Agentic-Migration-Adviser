@@ -1,11 +1,10 @@
 import socket
 from concurrent.futures import ThreadPoolExecutor, wait
 
-import oqs
-import pytest
-
 import framing
 import handshake
+import oqs
+import pytest
 import server
 from client import client_program
 
