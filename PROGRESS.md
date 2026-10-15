@@ -35,7 +35,7 @@ Why: the findings are naturally relational, queries can track risk across scans,
 **Next week:** Complete ML-KEM demo & tests. Merge PR. Setup CI workflow.
 
 ## Week 2 (2026-09-28 – 2026-10-04)
-**Focus:** Finish ML-KEM-DEMO & merge branch. Set up CI workflow. Start work on agents.
+**Focus:** Finish ML-KEM-DEMO & merge branch.
 
 **Done:**
 - Completed ML-KEM handshake demo via client/server sockets
@@ -63,7 +63,7 @@ Why: the findings are naturally relational, queries can track risk across scans,
 - Set up scanner agent framework
 
 ## Week 3 (2026-10-05 – 2026-10-11)
-**Focus:** Finish ML-KEM-DEMO & merge branch. Setup CI workflow. Start work on agents.
+**Focus:** Set up CI workflow. Start work on agents.
 
 **Done:**
 - Merged the refactor PR
@@ -106,6 +106,66 @@ Why: the findings are naturally relational, queries can track risk across scans,
 **Focus:** Scanner agent design and foundations
 
 **Done:**
+- Agent design
+- SQLite schema
+- Planning & issue/milestone creation
+- README & PROGRESS update after design changes
+
+**Didn't get to:**
+- Complete scanner due to major design changes
+
+**Blocked / struggled with:**
+- Struggled to make progress whilst travelling. I had to find ways to stay productive — I did this by working on design choices which were more accessible offline. 
+
+**Decisions made (and why):**
+- **Moved the ML-KEM demo into `foundations/` (tests in `tests/foundations/`);
+  `src/agentic_migration_adviser/` holds only the migration tool.** Kept the
+  four modules separate rather than merging them, to preserve the
+  framing/handshake mechanism-vs-policy split. Only config change:
+  pytest `pythonpath = ["foundations"]`. Why: the demo was for learning ML-KEM and isn’t part of the tool itself. Keeping it separate stops it mixing with the product code.
+- **Issue-driven workflow:** Issue → `gh issue develop` → commits → PR with
+  `Closes #N` → CI green → merge. Labels and milestones map to release tags
+  (v0.1.1, v0.2, v0.3, v0.4, v1.0).
+- **[CHANGED] Three agents → deterministic core + one agent.** Scanner and
+  risk scorer are rule-based; one hand-rolled Ollama loop runs a triage pass
+  and a planning pass. Why: only triage and planning need judgment; rules
+  are testable and defensible.
+- **[CHANGED] Risk scoring is rule-based**, with rule IDs (Shor vs Grover,
+  key exchange before signatures / HNDL, exposure, blast radius, migration
+  difficulty). Any LLM adjustment capped at one tier, stored separately.
+- **[NEW] LLM triage of low-confidence findings only.** Verdicts
+  include/exclude/needs-human with evidence; nothing is deleted.
+- **[NEW] SQLite is the only interface between stages, with safeguards:**
+  pure stage functions, one data-access module with a schema version, one
+  transaction per stage, validated agent write tools.
+- **[CHANGED] Schema extended from 2 tables** to repos, scans, findings,
+  risk scores, triage verdicts, plan_steps plus a link table. Scans record
+  the commit SHA, versions and status, and findings are fingerprinted. This
+  answers last week's open question: assessments get their own table.
+- **[DEFERRED] Non-Python languages.** Language-neutral schema and scanner
+  registry now; C/C++ parsing later.
+- **[REFINED] Targets:** trustme (smoke), PyJWT (primary), paramiko
+  (stretch), python-rsa (limitation demo), pinned by SHA.
+- **[REFINED] MVP fallback is v0.3** (scanner + risk scorer, no LLM). Decide
+  at the end of week 6 whether to build v0.4 or start Project 2.
+
+**Time spent:** ~6.5 hrs (under 10–12 target; found it harder to complete work due to travel. Decided to focus on design which didn't require as much setup: laptop, wifi, etc).
+
+**Next week:** 
+- Scanner tool foundations
+
+## Week 5 (2026-10-19 - 2026-10-25)
+**Focus:** Networking & application test — no project development this week.
+
+**Time spent:** ~0 hrs (under 10–12 target; this week I was focused on studying for a test I had to complete as part of a job application — I also had a day in London at a networking event).
+
+**Next week:** 
+- Scanner tool foundations
+
+## Week 6 (2026-10-26 - 2026-11-01)
+**Focus:** Scanner tool foundations
+
+**Done:**
 - 
 
 **Didn't get to:**
@@ -117,7 +177,7 @@ Why: the findings are naturally relational, queries can track risk across scans,
 **Decisions made (and why):**
 - 
 
-**Time spent:** ~1 hrs (under/expected/over 10–12 target; Why?)
+**Time spent:** ~ hrs (under/achieved/over 10–12 target; why?).
 
 **Next week:** 
-- 
+-
