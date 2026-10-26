@@ -1,7 +1,7 @@
-# Agentic PQC Migration Advisor
+# Agentic PQC Migration Adviser
 
-> **Status:** v0.1-foundations. This release contains the ML-KEM (FIPS 203)
-> key-exchange groundwork. The agent pipeline below is planned, not yet built.
+> **Status:** v0.1.1-foundations. This release contains the ML-KEM (FIPS 203)
+> key-exchange groundwork. The agent is planned for v0.4, not yet built.
 
 ## The problem
 Organisations face hard post-quantum migration deadlines. US federal systems
@@ -16,28 +16,41 @@ risk-ranked migration roadmap mapped to NIST's PQC standards.
 ## Planned architecture
 ```mermaid
 flowchart LR
-    A[Scanner Agent<br/>static-analysis tool] --> B[Risk Assessor Agent<br/>classify + map to FIPS 203/204/205]
-    B --> C[Migration Planner Agent<br/>roadmap + sample liboqs code]
+    subgraph rules [Deterministic rules]
+        S[Scanner<br/>ast · regex · deps] --> R[Risk Scorer<br/>rule IDs: Shor, Grover, HNDL]
+    end
+    subgraph agent [One agent loop, two passes]
+        T[Findings Triage<br/>low-confidence findings only] --> P[Migration Planner<br/>ordered fix steps, verified by rescan]
+    end
+    R --> T
+    DB[(SQLite: the only interface between stages)]
+    S <--> DB
+    R <--> DB
+    T <--> DB
+    P <--> DB
 ```
 
-| Agent | Role | Output |
-|---|---|---|
-| Scanner | Runs Python `ast` over the target repo. The LLM does not parse the code itself. | Findings with file/line, stored in SQLite |
-| Risk Assessor | RSA/ECC → critical (Shor's algorithm); symmetric → lower priority (Grover's algorithm) | Risk-ranked findings mapped to ML-KEM / ML-DSA / SLH-DSA |
-| Migration Planner | Sequences the fixes and drafts liboqs replacement snippets | Prioritised roadmap |
+| Stage | Rules or LLM | What it does | Output | Milestone |
+|---|---|---|---|---|
+| Scanner | Rules | Finds classical cryptography in three layers: Python call sites through ast (high confidence), declared and locked dependencies (medium), and regex over text and config files (low). | Findings with file, detection rule, fingerprint, line, key size, confidence, etc; stored in SQLite. | v0.2 |
+| Risk Scorer | Rules | Assigns a risk tier to every finding assuming they are real crypto usage: RSA/ECC → critical (Shor's algorithm); symmetric → lower priority (Grover's algorithm). Scored before triage so wrongly excluded high-risk findings can be flagged for human review. | Outputs a risk tier per finding, the rule IDs that fired, and the FIPS replacement from the lookup table. | v0.3 |
+| Findings Triage | LLM | Checks: 'is this real crypto usage?' per low-confidence finding. | The output is a verdict (include, exclude or needs-human) with a reason and the evidence lines. Nothing is deleted, and excluded findings still appear in the report. | v0.4 |
+| Migration Planner | LLM | Read the scored, triaged findings and review the context; deterministically looks up the corresponding post-quantum algorithm replacement and orders the steps based on risk-tier, code dependencies and operation type. Drafts fixes and verifies each with a rescan. | `the output is ordered fix steps, each linked to its findings and verified by a rescan. | v0.4 |
 
 The orchestration is hand-rolled, without an agent framework. It uses a local
 LLM through Ollama, so no API keys leave the machine.
 
 ## Repository layout
-foundations/ holds the v0.1 ML-KEM handshake groundwork, meaning the handshake, framing, client and server modules, with their tests in tests/foundations/.
-src/agentic_migration_adviser/ is the actual migration tool, where the Scanner, Risk Assessor and Planner will live.
+`foundations/` holds the v0.1 ML-KEM handshake groundwork, meaning the handshake, framing, client and server modules, with their tests in `tests/foundations/`.
+`src/agentic_migration_adviser/` is the actual migration tool, where the Scanner, Risk Assessor and Planner will live.
 I split them since the demo was for learning ML-KEM and isn’t part of the tool itself. Keeping it separate stops it mixing with the product code.
 
-foundations/                  # v0.1: ML-KEM handshake demo
+```text
+foundations/                      # v0.1: ML-KEM handshake demo
 tests/foundations/
-src/agentic_migration_adviser/  # the migration tool (Scanner onwards)
-tests/scanner/                # coming in v0.2
+src/agentic_migration_adviser/    # the migration tool (Scanner onwards)
+tests/scanner/                    # coming in v0.2
+```
 
 ## What's in this release
 - `foundations/handshake.py`: the algorithm is set by the ALGORITHM constant (currently ML-KEM-768, tests adapt accordingly) KeyGen → Encaps → Decaps using liboqs-python.
@@ -45,9 +58,9 @@ tests/scanner/                # coming in v0.2
   generates the keypair and the server encapsulates, mirroring how TLS 1.3
   hybrid key exchange (X25519MLKEM768) carries the public key in the
   ClientHello and returns the ciphertext in the ServerHello.
-- `foundations/test/test_handshake.py`: test/test_shared_secret_matches, test/test_implicit_rejection, test/test_public_key_size, test/test_private_key_size, test/test_shared_secret_size, test/test_ciphertext_size, test/test_diff_handshakes_give_diff_secrets, test/test_ciphertext_error, test/test_public_key_error, test/test_keypairs_are_ephemeral
-- `foundations/test/test_framing.py`: test/test_round_trip, test/test_realistic_size, test/test_message_boundaries, test/test_fragmented_delivery, test/test_peer_closes_mid_message, test/test_oversized_header, test/test_empty_payload.
-- `foundations/test/test_socket_handshake.py`: integration tests. test/test_secrets_match check client and server get the same key of the correct length. test/test_server_rejects_wrong_size_public_key, test/test_client_fails_when_no_server_listening, test/test_server_timeout_on_silent_client.
+- `tests/foundations/test_framing.py`: round trips, message boundaries, fragmented delivery, early disconnects, oversized headers
+- `tests/foundations/test_handshake.py`: matching shared secrets, implicit rejection of tampered ciphertext, key/ciphertext/secret sizes checked against liboqs, wrong-size input errors, fresh keypair per client
+- `tests/foundations/test_socket_handshake.py`: matching secrets over TCP, server rejecting a wrong-size public key, client failing fast with no server, server timing out a silent client
 
 ## Quick start
 Requires Python >=3.10 and
@@ -88,13 +101,16 @@ ciphertext 1088 B, shared secret 32 B.
 ## Limitations & roadmap
 - This is a key-exchange demo, not TLS. The handshake is unauthenticated,
   and a real deployment would need signatures such as ML-DSA.
-- [ ] Scanner Agent + SQLite findings store
-- [ ] Risk Assessor Agent
+- [x] GitHub Actions CI (pytest + ruff)
+- [ ] Scanner Tool + SQLite findings store
+- [ ] Risk Scorer Rules
+- [ ] Findings Triage Tool
 - [ ] Migration Planner Agent + orchestrator
-- [ ] GitHub Actions CI (pytest + ruff)
 - [ ] Dockerfile for one-command setup
 - [ ] Support for codebases beyond Python
 
 ## Tech stack
-Used: python, liboqs-python (Open Quantum Safe), NIST ML-KEM, uv.
-Planned: SQLite, Ollama, GitHub Actions, Docker.
+```text
+Used: python, liboqs-python (Open Quantum Safe), NIST ML-KEM, uv, GitHub Actions.
+Planned: SQLite, Ollama, Docker.
+```
