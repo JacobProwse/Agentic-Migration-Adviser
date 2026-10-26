@@ -99,7 +99,7 @@ Why: the findings are naturally relational, queries can track risk across scans,
 - Scanner agent design & decisions (regarding tools, scope, sqlite, etc)
 - Create issues/work schedule for scanner agent
 - Scanner agent file framework
-- Scannar agent API
+- Scanner agent API
 - Scanner agent fitted with basic tools
 
 ## Week 4 (2026-10-12 - 2026-10-18)
@@ -156,6 +156,9 @@ Why: the findings are naturally relational, queries can track risk across scans,
 
 ## Week 5 (2026-10-19 - 2026-10-25)
 **Focus:** Networking & application test — no project development this week.
+
+**Decisions made (and why):**
+- Score before triage, so excluded findings that would have been critical can be flagged for human review.
 
 **Time spent:** ~0 hrs (under 10–12 target; this week I was focused on studying for a test I had to complete as part of a job application — I also had a day in London at a networking event).
 
