@@ -166,21 +166,57 @@ Why: the findings are naturally relational, queries can track risk across scans,
 - Scanner tool foundations
 
 ## Week 6 (2026-10-26 - 2026-11-01)
-**Focus:** Scanner tool foundations
+**Focus:** Catch-up, v0.1.1 housekeeping, schema design, start of ast learning
 
 **Done:**
-- 
+- Created labels, all five milestones, the ten v0.2 issues and a v0.2 tracking issue, linked with "Blocked by #n"
+- Rewrote the README architecture section and added the design-decisions record (#8, #10), closing v0.1.1
+- Designed the nine-table findings schema with an ER diagram, constraints and deliberate 3NF exceptions
+- Started learning ast (#11) with Stefanie Molin's AST workshop: NodeVisitor, generic_visit, scope stack and import tracking
+- Built an imports-and-calls visitor in my workshop fork (`bridge/calls_visitor.py`): alias resolution, dotted call names, positional/keyword counts and constant arguments (the start of reading `key_size=2048`)
 
 **Didn't get to:**
-- 
+- Learn sqlite3 (#4), fixture folder (#6)
 
 **Blocked / struggled with:**
-- 
+- Getting from a `Call` node to a full dotted name: `Attribute` chains nest inside out, so they have to be walked and reversed
+- Storing the `Constant` node instead of its `.value`. It's an easy mistake to miss unless you print the output
 
 **Decisions made (and why):**
-- 
+- Create issues one milestone at a time, not all 21 up front. Why: plans go stale, and v0.4 may not happen.
+- The README shows only the tables in the current release; the full design lives in `docs/schema.md`. Why: the README shouldn't overstate the project.
+- Skip NodeTransformer. Why: the Scanner only reads code; it never rewrites it.
 
-**Time spent:** ~ hrs (under/achieved/over 10–12 target; why?).
+**Time spent:** ~10 hrs (achieved 10–12 target).
 
-**Next week:** 
--
+**Next week:**
+- Finish ast learning: snippets, verification, mutation checks, gap analysis on PyJWT
+
+## Week 7 (2026-11-02 - 2026-11-08)
+**Focus:** Finish ast learning (#11)
+
+**Done:**
+- Added source snippets, verified the visitor on test files covering call shapes and all four import styles, and ran mutation checks (each break visibly changed the output)
+- Ran a gap analysis on PyJWT `jwt/algorithms.py`: 340 calls, 150 resolved (44%). Recorded in `bridge/GAPS.md`
+- Wrote acceptance criteria for the AST scanner (#17) from the gaps found
+- Wrote the learning note and closed #11
+
+**Didn't get to:**
+- Learn sqlite3 (#4); committing `docs/schema.md` to the repo; fixture folder (#6)
+
+**Blocked / struggled with:**
+- A renamed field broke my grep, so the resolved count showed 340/340. Lesson: check that the measurement can fail, not just the code.
+
+**Decisions made (and why):**
+- The Scanner must also visit `Attribute` loads, not just calls. Why: `hashes.SHA256` etc. are passed around as values, so a calls-only scanner misses them.
+- Relative imports and `import a.b` need explicit handling in #17. Why: dropping `level` risks reading a local `rsa.py` as python-rsa; `import a.b` binds only `a`, so full-path calls are missed.
+- `findings.snippet` stores the matched line, not the multi-line source segment. Why: it matches the schema and keeps the report readable.
+- Unparseable files are logged and skipped, not fatal. Why: real repos contain Python 2 code and templates.
+- Write the Scanner from scratch in the project and keep `bridge/` as reference only. Why: I need to be able to rebuild and defend it.
+- Avoid 3.14-only APIs such as `ast.compare`. Why: the project targets 3.10.
+
+**Time spent:** ~4 hrs (under 10–12 target; focused on preparing for and completing 2 online tests).
+
+**Next week:**
+- Commit `docs/schema.md` (#5), learn sqlite3 (#4), build the fixture folder and answer key (#6)
+- Make the overdue end-of-week-6 decision: v0.4 or Project 2. v0.2 is now about 2 weeks behind the briefing
