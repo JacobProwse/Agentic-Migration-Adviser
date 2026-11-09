@@ -1,1 +1,2 @@
-CREATE TABLE repos(id, name, url)
+CREATE TABLE repos(id INTEGER PRIMARY KEY, name TEXT UNIQUE, url TEXT, local_path TEXT, created_at TEXT);
+CREATE TABLE scans(id INTEGER PRIMARY KEY, repo_id INTEGER, FOREIGN KEY (repo_id) REFERENCES repos(id))
