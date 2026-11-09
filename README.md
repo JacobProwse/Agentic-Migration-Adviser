@@ -63,7 +63,7 @@ tests/scanner/                    # coming in v0.2
 - `tests/foundations/test_socket_handshake.py`: matching secrets over TCP, server rejecting a wrong-size public key, client failing fast with no server, server timing out a silent client
 
 ## Quick start
-Requires Python >=3.10 and
+Requires Python >=3.14 and
 [uv](https://docs.astral.sh/uv/). On macOS, liboqs needs `brew install cmake ninja`.
 
     git clone https://github.com/JacobProwse/Agentic-Migration-Adviser.git
