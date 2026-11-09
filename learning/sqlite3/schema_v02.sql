@@ -1,0 +1,1 @@
+CREATE TABLE repos(id, name, url)
