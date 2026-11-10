@@ -1,2 +1,2 @@
-CREATE TABLE repos(id INTEGER PRIMARY KEY, name TEXT UNIQUE, url TEXT, local_path TEXT, created_at TEXT);
-CREATE TABLE scans(id INTEGER PRIMARY KEY, repo_id INTEGER, FOREIGN KEY (repo_id) REFERENCES repos(id))
+CREATE TABLE repos(id INTEGER PRIMARY KEY NOT NULL, name TEXT UNIQUE NOT NULL, url TEXT, local_path TEXT, created_at TEXT);
+CREATE TABLE scans(id INTEGER PRIMARY KEY NOT NULL, repo_id INTEGER NOT NULL, commit_sha TEXT, scanner_version TEXT NOT NULL, rules_version TEXT NOT NULL, status TEXT, error_message TEXT, started_at TEXT, ended_at TEXT, FOREIGN KEY (repo_id) REFERENCES repos(id))
