@@ -19,4 +19,13 @@ for table in tables:
     print("\n")
     print(f"Table: {table_name}")
     for field in fields:
-        print(field[1], field[2])  # field name and type
+        print(field[1], field[2], field[3])
+
+res = cur.execute("PRAGMA foreign_keys")
+print(res.fetchall())
+cur.execute("PRAGMA foreign_keys = OFF")
+res = cur.execute("PRAGMA foreign_keys")
+print(res.fetchall())
+res = cur.execute("INSERT INTO findings (id, file_id, fingerprint, line, detection_rule_code, detection_method, primitive, operation, confidence) VALUES (0, 0, 'fingerprint1', 12, 'DET-PY-007', 'ast', 'rsa', 'key gen', 'high')")
+cur.execute("PRAGMA foreign_keys = ON")
+res = cur.execute("INSERT INTO findings (id, file_id, fingerprint, line, detection_rule_code, detection_method, primitive, operation, confidence) VALUES (1, 1, 'fingerprint1', 12, 'DET-PY-007', 'ast', 'rsa', 'key gen', 'high')")
